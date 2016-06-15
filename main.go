@@ -24,5 +24,6 @@ func main() {
 	questions.New(api, globalConfig.dbServer, globalConfig.dbName)
 	defer questions.Close()
 	fmt.Println(e.Routes())
+	fmt.Println("listening On ", globalConfig.listen)
 	e.Run(standard.New(globalConfig.listen))
 }

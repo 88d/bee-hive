@@ -26,14 +26,17 @@ func LoadConfiguration() {
 		panic(listenMissing)
 	}
 	globalConfig.listen = listen
-	var dbAddress, dbMissingServer = cfg.String("db.server")
+	fmt.Println("Listen:", listen)
+	var dbServer, dbMissingServer = cfg.String("db.server")
 	if dbMissingServer != nil {
 		panic(dbMissingServer)
 	}
-	globalConfig.dbServer = dbAddress
+	globalConfig.dbServer = dbServer
+	fmt.Println("DBServer:", dbServer)
 	var dbName, dbMissingDatabase = cfg.String("db.name")
 	if dbMissingDatabase != nil {
 		panic(dbMissingDatabase)
 	}
 	globalConfig.dbName = dbName
+	fmt.Println("DBName:", dbName)
 }
