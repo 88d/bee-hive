@@ -1,0 +1,7 @@
+{
+    "listen":":1323",
+    "db": {
+        "server":"localhost:28015",
+        "name":"test"
+    }
+}
