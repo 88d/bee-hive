@@ -17,6 +17,7 @@ var globalConfig = new(Config)
 func LoadConfiguration() {
 	// Configuration
 	cfg, err := config.ParseJsonFile("config.json")
+	cfg.Env().Flag()
 	if err != nil {
 		fmt.Print(err)
 		panic(err)
