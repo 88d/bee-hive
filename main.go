@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/black-banana/bee-hive/questions"
 	"github.com/labstack/echo"
@@ -23,7 +23,12 @@ func main() {
 	api := e.Group("/api")
 	questions.New(api, globalConfig.dbServer, globalConfig.dbName)
 	defer questions.Close()
-	fmt.Println(e.Routes())
-	fmt.Println("listening On ", globalConfig.listen)
+
+	routes := e.Routes()
+	for _, route := range routes {
+		log.Println(route.Method, route.Path)
+	}
+
+	log.Println("Started with", globalConfig.listen)
 	e.Run(standard.New(globalConfig.listen))
 }

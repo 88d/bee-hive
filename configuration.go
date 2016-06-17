@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/olebedev/config"
 )
@@ -19,7 +19,6 @@ func LoadConfiguration() {
 	cfg, err := config.ParseJsonFile("config.json")
 	cfg.Env().Flag()
 	if err != nil {
-		fmt.Print(err)
 		panic(err)
 	}
 	var listen, listenMissing = cfg.String("listen")
@@ -27,17 +26,17 @@ func LoadConfiguration() {
 		panic(listenMissing)
 	}
 	globalConfig.listen = listen
-	fmt.Println("Listen:", listen)
+	log.Println("Listen", listen)
 	var dbServer, dbMissingServer = cfg.String("db.server")
 	if dbMissingServer != nil {
 		panic(dbMissingServer)
 	}
 	globalConfig.dbServer = dbServer
-	fmt.Println("DBServer:", dbServer)
+	log.Println("DBServer", dbServer)
 	var dbName, dbMissingDatabase = cfg.String("db.name")
 	if dbMissingDatabase != nil {
 		panic(dbMissingDatabase)
 	}
 	globalConfig.dbName = dbName
-	fmt.Println("DBName:", dbName)
+	log.Println("DBName", dbName)
 }
