@@ -26,7 +26,7 @@ func initDB(session *r.Session, dbName string) error {
 	}
 	if !isStringInArray(dbName, dbs) {
 		log.Println("Create DB", dbName)
-		_, errCreateDB := r.DBCreate(dbName).RunWrite(session)
+		errCreateDB := r.DBCreate(dbName).Exec(session)
 		if errCreateDB != nil {
 			return errCreateDB
 		}
@@ -46,7 +46,7 @@ func initTable(session *r.Session, dbName string, table string) error {
 	}
 	if !isStringInArray(table, tables) {
 		log.Println("Create table", table, "in DB", dbName)
-		_, errCreateDB := r.DB(dbName).TableCreate(table).RunWrite(session)
+		errCreateDB := r.DB(dbName).TableCreate(table).Exec(session)
 		if errCreateDB != nil {
 			panic(errCreateDB)
 		}
