@@ -19,8 +19,7 @@ func (re *Repository) GetAll() ([]Question, error) {
 	}
 	defer res.Close()
 	var questions []Question
-	err = res.All(&questions)
-	if err != nil {
+	if err := res.All(&questions); err != nil {
 		return nil, err
 	}
 	return questions, err

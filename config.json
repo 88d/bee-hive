@@ -2,6 +2,8 @@
     "listen":":9999",
     "db": {
         "server":"localhost:28015",
-        "name":"test"
+        "name":"test",
+        "maxidle":10,
+        "maxcon":10
     }
 }

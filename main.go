@@ -16,6 +16,9 @@ func main() {
 	// LoadConfiguration from config.json
 	LoadConfiguration()
 
+	rethink.InitMasterSession(globalConfig.dbServer, globalConfig.dbName)
+	defer rethink.CloseMasterSession()
+
 	// Echo instance
 	e := echo.New()
 
@@ -26,12 +29,9 @@ func main() {
 	api := e.Group("/api")
 	questions.New(api)
 
-	rethink.InitMasterSession(globalConfig.dbServer, globalConfig.dbName)
-	defer rethink.CloseMasterSession()
-
 	go hub.Run()
 
-	e.GET("/ws", standard.WrapHandler(http.HandlerFunc(hub.ServeHub())))
+	e.GET("/hub", standard.WrapHandler(http.HandlerFunc(hub.ServeHub())))
 
 	routes := e.Routes()
 	for _, route := range routes {

@@ -7,12 +7,12 @@ type Repository struct {
 	table   string
 }
 
-func (re Repository) Table() r.Term {
+func (re *Repository) Table() r.Term {
 	return r.Table(re.table)
 }
 
-func initRepository(repo Repository) error {
-	if err := CreateTableIfNotExists(repo.Session, repo.table); err != nil {
+func (re *Repository) init() error {
+	if err := CreateTableIfNotExists(re.Session, re.table); err != nil {
 		return err
 	}
 	return nil
@@ -20,7 +20,7 @@ func initRepository(repo Repository) error {
 
 func NewRepository(table string) Repository {
 	var repo = Repository{masterSession, table}
-	if err := initRepository(repo); err != nil {
+	if err := repo.init(); err != nil {
 		panic(err)
 	}
 	return repo

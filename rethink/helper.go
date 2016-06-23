@@ -46,7 +46,7 @@ func CreateTableIfNotExists(session *r.Session, table string) error {
 		log.Println("Create table", table)
 		errCreateDB := r.TableCreate(table).Exec(session)
 		if errCreateDB != nil {
-			panic(errCreateDB)
+			return err
 		}
 	}
 	return nil
@@ -55,7 +55,8 @@ func CreateTableIfNotExists(session *r.Session, table string) error {
 var masterSession *r.Session
 
 func InitMasterSession(adress string, database string) {
-	masterSession, err := r.Connect(r.ConnectOpts{
+	var err error
+	masterSession, err = r.Connect(r.ConnectOpts{
 		Address:  adress,
 		Database: database,
 		MaxIdle:  10,
