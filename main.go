@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"net/http"
 
+	"github.com/black-banana/bee-hive/hub"
 	"github.com/black-banana/bee-hive/questions"
 	"github.com/black-banana/bee-hive/rethink"
 	"github.com/labstack/echo"
@@ -27,9 +29,9 @@ func main() {
 	rethink.InitMasterSession(globalConfig.dbServer, globalConfig.dbName)
 	defer rethink.CloseMasterSession()
 
-	//go hub.Run()
+	go hub.Run()
 
-	//e.GET("/ws", standard.WrapHandler(http.HandlerFunc(hub.ServeHub())))
+	e.GET("/ws", standard.WrapHandler(http.HandlerFunc(hub.ServeHub())))
 
 	routes := e.Routes()
 	for _, route := range routes {
