@@ -6,21 +6,13 @@ import (
 	"github.com/labstack/echo"
 )
 
-var repository Repository
-
-func New(e *echo.Group, server string, database string) {
-	repository = NewRepository(server, database)
+func New(e *echo.Group) {
+	repository = NewRepository()
 	group := e.Group("/questions")
 	group.Get("", getAll)
 	group.Post("", create)
 	group.Put("/:id", update)
 	group.Delete("/:id", delete)
-}
-
-func Close() {
-	if repository.session != nil {
-		repository.session.Close()
-	}
 }
 
 func getAll(c echo.Context) error {
