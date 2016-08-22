@@ -47,7 +47,7 @@ func update(c echo.Context) error {
 }
 
 func delete(c echo.Context) error {
-	if err := repository.Remove(c.Param("id")); err != nil {
+	if err := repository.RemoveByID(c.Param("id")); err != nil {
 		return err
 	}
 	return c.String(http.StatusOK, "")

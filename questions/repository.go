@@ -41,7 +41,7 @@ func (re *Repository) Update(q *Question) error {
 	return nil
 }
 
-func (re *Repository) Remove(id string) error {
+func (re *Repository) RemoveByID(id string) error {
 	if _, err := re.Table().Get(id).Delete().RunWrite(re.Session); err != nil {
 		return err
 	}
