@@ -16,8 +16,8 @@ func main() {
 	// LoadConfiguration from config.json
 	LoadConfiguration()
 
-	rethink.InitMasterSession(globalConfig.dbServer, globalConfig.dbName)
-	defer rethink.CloseMasterSession()
+	rethink.StartMasterSession(globalConfig.db)
+	defer rethink.StopMasterSession()
 
 	// Echo instance
 	e := echo.New()

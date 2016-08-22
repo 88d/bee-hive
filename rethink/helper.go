@@ -54,22 +54,22 @@ func CreateTableIfNotExists(session *r.Session, table string) error {
 
 var masterSession *r.Session
 
-func InitMasterSession(adress string, database string) {
+func StartMasterSession(config *Config) {
 	var err error
 	masterSession, err = r.Connect(r.ConnectOpts{
-		Address:  adress,
-		Database: database,
-		MaxIdle:  10,
-		MaxOpen:  10,
+		Address:  config.Server,
+		Database: config.Name,
+		MaxIdle:  config.MaxIdle,
+		MaxOpen:  config.MaxOpen,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := CreateDBIfNotExists(masterSession, database); err != nil {
+	if err := CreateDBIfNotExists(masterSession, config.Name); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
-func CloseMasterSession() {
+func StopMasterSession() {
 	masterSession.Close()
 }

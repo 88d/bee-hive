@@ -4,6 +4,6 @@
         "server":"localhost:28015",
         "name":"test",
         "maxidle":10,
-        "maxcon":10
+        "maxopen":10
     }
 }
