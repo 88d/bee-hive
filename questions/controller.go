@@ -12,6 +12,7 @@ func New(e *echo.Group) {
 	group.Get("", getAll)
 	group.Post("", create)
 	group.Put("/:id", update)
+	group.Get("/:id", getByID)
 	group.Delete("/:id", delete)
 }
 
@@ -21,6 +22,14 @@ func getAll(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusOK, items)
+}
+
+func getByID(c echo.Context) error {
+	q, err := repository.GetByID(c.Param("id"))
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, q)
 }
 
 func create(c echo.Context) error {

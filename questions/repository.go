@@ -41,6 +41,19 @@ func (re *Repository) Update(q *Question) error {
 	return nil
 }
 
+func (re *Repository) GetByID(id string) (*Question, error) {
+	res, err := re.Table().Get(id).Run(re.Session)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Close()
+	var q *Question
+	if err := res.One(&q); err != nil {
+		return nil, err
+	}
+	return q, nil
+}
+
 func (re *Repository) RemoveByID(id string) error {
 	if _, err := re.Table().Get(id).Delete().RunWrite(re.Session); err != nil {
 		return err
