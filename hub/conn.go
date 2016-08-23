@@ -50,10 +50,9 @@ func (c *Conn) readPump() {
 		var message Message
 		if err := c.WebSocket.ReadJSON(&message); err != nil {
 			return
-		} else {
-			message.Author = c.UserID
-			h.Broadcast(&message)
 		}
+		message.Author = c.UserID
+		h.Broadcast(&message)
 	}
 }
 
