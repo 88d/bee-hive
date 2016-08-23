@@ -6,6 +6,11 @@ import (
 	"github.com/labstack/echo"
 )
 
+var (
+	paramQuestion = "questionId"
+	paramID       = "id"
+)
+
 func New(e *echo.Group) {
 	repository = NewRepository()
 	group := e.Group("/:questionId/answers")
@@ -17,7 +22,7 @@ func New(e *echo.Group) {
 }
 
 func getAll(c echo.Context) error {
-	var items, err = repository.GetAll(c.Param("questionId"))
+	var items, err = repository.GetAll(c.Param(paramQuestion))
 	if err != nil {
 		return err
 	}
@@ -25,7 +30,7 @@ func getAll(c echo.Context) error {
 }
 
 func getByID(c echo.Context) error {
-	a, err := repository.GetByID(c.Param("questionId"), c.Param("id"))
+	a, err := repository.GetByID(c.Param(paramQuestion), c.Param(paramID))
 	if err != nil {
 		return err
 	}
@@ -37,7 +42,7 @@ func create(c echo.Context) error {
 	if err := c.Bind(a); err != nil {
 		return err
 	}
-	if err := repository.Create(c.Param("questionId"), a); err != nil {
+	if err := repository.Create(c.Param(paramQuestion), a); err != nil {
 		return err
 	}
 	return c.JSON(http.StatusCreated, a)
@@ -48,15 +53,15 @@ func update(c echo.Context) error {
 	if err := c.Bind(a); err != nil {
 		return err
 	}
-	a.ID = c.Param("id")
-	if err := repository.Update(c.Param("questionId"), a); err != nil {
+	a.ID = c.Param(paramID)
+	if err := repository.Update(c.Param(paramQuestion), a); err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, a)
 }
 
 func delete(c echo.Context) error {
-	if err := repository.RemoveByID(c.Param("questionId"), c.Param("id")); err != nil {
+	if err := repository.RemoveByID(c.Param(paramQuestion), c.Param(paramID)); err != nil {
 		return err
 	}
 	return c.String(http.StatusOK, "")

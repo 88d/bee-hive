@@ -6,6 +6,9 @@ import (
 	"github.com/labstack/echo"
 )
 
+var paramID = "id"
+
+// New creates a new instance of the users Controller
 func New(e *echo.Group) {
 	repository = NewRepository()
 	group := e.Group("/users")
@@ -25,7 +28,7 @@ func getAll(c echo.Context) error {
 }
 
 func getByID(c echo.Context) error {
-	q, err := repository.GetByID(c.Param("id"))
+	q, err := repository.GetByID(c.Param(paramID))
 	if err != nil {
 		return err
 	}
@@ -48,7 +51,7 @@ func update(c echo.Context) error {
 	if err := c.Bind(q); err != nil {
 		return err
 	}
-	q.ID = c.Param("id")
+	q.ID = c.Param(paramID)
 	if err := repository.Update(q); err != nil {
 		return err
 	}
@@ -56,7 +59,7 @@ func update(c echo.Context) error {
 }
 
 func delete(c echo.Context) error {
-	if err := repository.RemoveByID(c.Param("id")); err != nil {
+	if err := repository.RemoveByID(c.Param(paramID)); err != nil {
 		return err
 	}
 	return c.String(http.StatusOK, "")
