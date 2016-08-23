@@ -1,4 +1,4 @@
-package question
+package questions
 
 import "github.com/black-banana/bee-hive/rethink"
 import r "github.com/dancannon/gorethink"

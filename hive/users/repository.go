@@ -1,4 +1,4 @@
-package user
+package users
 
 import "github.com/black-banana/bee-hive/rethink"
 

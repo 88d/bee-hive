@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/black-banana/bee-hive/hive/question"
-	"github.com/black-banana/bee-hive/hive/user"
+	"github.com/black-banana/bee-hive/hive/questions"
+	"github.com/black-banana/bee-hive/hive/users"
 	"github.com/black-banana/bee-hive/hub"
 	"github.com/black-banana/bee-hive/rethink"
 	"github.com/labstack/echo"
@@ -56,8 +56,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	api := e.Group("/api")
-	question.New(api)
-	user.New(api)
+	questions.New(api)
+	users.New(api)
 
 	go hub.Run()
 

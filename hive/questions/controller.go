@@ -1,23 +1,25 @@
-package answer
+package questions
 
 import (
 	"net/http"
 
+	"github.com/black-banana/bee-hive/hive/answers"
 	"github.com/labstack/echo"
 )
 
 func New(e *echo.Group) {
 	repository = NewRepository()
-	group := e.Group("/:questionId/answers")
+	group := e.Group("/questions")
 	group.Get("", getAll)
 	group.Post("", create)
 	group.Put("/:id", update)
 	group.Get("/:id", getByID)
 	group.Delete("/:id", delete)
+	answers.New(group)
 }
 
 func getAll(c echo.Context) error {
-	var items, err = repository.GetAll(c.Param("questionId"))
+	var items, err = repository.GetAll()
 	if err != nil {
 		return err
 	}
@@ -25,38 +27,38 @@ func getAll(c echo.Context) error {
 }
 
 func getByID(c echo.Context) error {
-	a, err := repository.GetByID(c.Param("questionId"), c.Param("id"))
+	q, err := repository.GetByID(c.Param("id"))
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, a)
+	return c.JSON(http.StatusOK, q)
 }
 
 func create(c echo.Context) error {
-	a := new(Answer)
-	if err := c.Bind(a); err != nil {
+	q := new(Question)
+	if err := c.Bind(q); err != nil {
 		return err
 	}
-	if err := repository.Create(c.Param("questionId"), a); err != nil {
+	if err := repository.Create(q); err != nil {
 		return err
 	}
-	return c.JSON(http.StatusCreated, a)
+	return c.JSON(http.StatusCreated, q)
 }
 
 func update(c echo.Context) error {
-	a := new(Answer)
-	if err := c.Bind(a); err != nil {
+	q := new(Question)
+	if err := c.Bind(q); err != nil {
 		return err
 	}
-	a.ID = c.Param("id")
-	if err := repository.Update(c.Param("questionId"), a); err != nil {
+	q.ID = c.Param("id")
+	if err := repository.Update(q); err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, a)
+	return c.JSON(http.StatusOK, q)
 }
 
 func delete(c echo.Context) error {
-	if err := repository.RemoveByID(c.Param("questionId"), c.Param("id")); err != nil {
+	if err := repository.RemoveByID(c.Param("id")); err != nil {
 		return err
 	}
 	return c.String(http.StatusOK, "")
