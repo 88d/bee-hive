@@ -20,7 +20,7 @@ const (
 	maxMessageSize = 512
 )
 
-// Conn is an middleman between the websocket connection and the hub.
+// Client is an middleman between the websocket connection and the hub.
 type Client struct {
 	WebSocket    *websocket.Conn
 	Send         chan *Message

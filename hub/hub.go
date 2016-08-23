@@ -2,7 +2,7 @@ package hub
 
 type Hub struct {
 	// Registered connections.
-	connections map[*Client]bool
+	clients map[*Client]bool
 
 	// Inbound messages from the connections.
 	broadcast chan *Message
@@ -16,10 +16,10 @@ type Hub struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		broadcast:   make(chan *Message),
-		register:    make(chan *Client),
-		unregister:  make(chan *Client),
-		connections: make(map[*Client]bool),
+		broadcast:  make(chan *Message),
+		register:   make(chan *Client),
+		unregister: make(chan *Client),
+		clients:    make(map[*Client]bool),
 	}
 }
 
@@ -32,20 +32,20 @@ func Run() {
 func (h *Hub) Run() {
 	for {
 		select {
-		case conn := <-h.register:
-			h.connections[conn] = true
-		case conn := <-h.unregister:
-			if _, ok := h.connections[conn]; ok {
-				delete(h.connections, conn)
-				close(conn.Send)
+		case client := <-h.register:
+			h.clients[client] = true
+		case client := <-h.unregister:
+			if _, ok := h.clients[client]; ok {
+				delete(h.clients, client)
+				close(client.Send)
 			}
 		case message := <-h.broadcast:
-			for conn := range h.connections {
+			for client := range h.clients {
 				select {
-				case conn.Send <- message:
+				case client.Send <- message:
 				default:
-					close(conn.Send)
-					delete(h.connections, conn)
+					close(client.Send)
+					delete(h.clients, client)
 				}
 			}
 		}
@@ -62,4 +62,12 @@ func (h *Hub) UnRegister(conn *Client) {
 
 func (h *Hub) Broadcast(msg *Message) {
 	h.broadcast <- msg
+}
+
+func (h *Hub) SendToUser(userID string, msg *Message) {
+	for client := range h.clients {
+		if client.UserID == userID {
+			client.Send <- msg
+		}
+	}
 }
