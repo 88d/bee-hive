@@ -12,7 +12,7 @@ func isStringInArray(a string, list []string) bool {
 	return false
 }
 
-func CreateDBIfNotExists(session *r.Session, dbName string) error {
+func createDBIfNotExists(session *r.Session, dbName string) error {
 	log.Println("CreateDBIfNotExists", dbName)
 	dbListRes, err := r.DBList().Run(session)
 	if err != nil {
@@ -32,6 +32,7 @@ func CreateDBIfNotExists(session *r.Session, dbName string) error {
 	return nil
 }
 
+// CreateTableIfNotExists creates a table if this does not exist
 func CreateTableIfNotExists(session *r.Session, table string) error {
 	log.Println("CreateTableIfNotExists", table)
 	tableListRes, err := r.TableList().Run(session)
@@ -52,8 +53,29 @@ func CreateTableIfNotExists(session *r.Session, table string) error {
 	return nil
 }
 
+func CreateTableIndexIfNotExists(session *r.Session, table string, index string) error {
+	log.Println("CreateTableIndexIfNotExists", table)
+	indexListRes, err := r.Table(table).IndexList().Run(session)
+	if err != nil {
+		return err
+	}
+	var indexes []string
+	if err := indexListRes.All(&indexes); err != nil {
+		return err
+	}
+	if !isStringInArray(index, indexes) {
+		log.Println("Create index", index)
+		errCreateDB := r.Table(table).IndexCreate(index).Exec(session)
+		if errCreateDB != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 var masterSession *r.Session
 
+// StartMasterSession must be called to connect to the server
 func StartMasterSession(config *Config) {
 	var err error
 	masterSession, err = r.Connect(r.ConnectOpts{
@@ -65,11 +87,12 @@ func StartMasterSession(config *Config) {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := CreateDBIfNotExists(masterSession, config.Name); err != nil {
+	if err := createDBIfNotExists(masterSession, config.Name); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
+// StopMasterSession should be called after the application stops
 func StopMasterSession() {
 	masterSession.Close()
 }
