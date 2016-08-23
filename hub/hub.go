@@ -23,10 +23,10 @@ func NewHub() *Hub {
 	}
 }
 
-var h = NewHub()
+var root = NewHub()
 
 func Run() {
-	h.Run()
+	root.Run()
 }
 
 func (h *Hub) Run() {

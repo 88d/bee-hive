@@ -40,7 +40,7 @@ func NewClient(ws *websocket.Conn, userId string, sessionToken string) *Client {
 // readPump pumps messages from the websocket connection to the hub.
 func (c *Client) readPump() {
 	defer func() {
-		h.UnRegister(c)
+		root.UnRegister(c)
 		c.WebSocket.Close()
 	}()
 	c.WebSocket.SetReadLimit(maxMessageSize)
@@ -52,7 +52,7 @@ func (c *Client) readPump() {
 			return
 		}
 		message.Author = c.UserID
-		h.Broadcast(&message)
+		root.Broadcast(&message)
 	}
 }
 

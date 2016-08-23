@@ -3,6 +3,7 @@ package hub
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -23,8 +24,8 @@ func (h *Hub) ServeHub() http.HandlerFunc {
 			log.Println(err)
 			return
 		}
-		ids += 1
-		conn := NewClient(ws, string(ids), "blablabla")
+		ids++
+		conn := NewClient(ws, strconv.Itoa(ids), "blablabla")
 		h.register <- conn
 		go conn.writePump()
 		conn.readPump()
@@ -32,5 +33,5 @@ func (h *Hub) ServeHub() http.HandlerFunc {
 }
 
 func ServeHub() http.HandlerFunc {
-	return h.ServeHub()
+	return root.ServeHub()
 }
