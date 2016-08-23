@@ -28,7 +28,7 @@ type Client struct {
 	UserID       string
 }
 
-func NewConn(ws *websocket.Conn, userId string, sessionToken string) *Client {
+func NewClient(ws *websocket.Conn, userId string, sessionToken string) *Client {
 	return &Client{
 		Send:         make(chan *Message, 64),
 		WebSocket:    ws,
@@ -69,18 +69,26 @@ func (c *Client) writePump() {
 		select {
 		case message, ok := <-c.Send:
 			if !ok {
-				c.WebSocket.WriteMessage(websocket.CloseMessage, []byte{})
+				c.WriteMessage(websocket.CloseMessage)
 				return
 			}
-			c.WebSocket.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.WebSocket.WriteJSON(message); err != nil {
+			if err := c.WriteJSON(message); err != nil {
 				return
 			}
-
 		case <-ticker.C:
-			if err := c.WebSocket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+			if err := c.WriteMessage(websocket.PingMessage); err != nil {
 				return
 			}
 		}
 	}
+}
+
+func (c *Client) WriteJSON(msg *Message) error {
+	c.WebSocket.SetWriteDeadline(time.Now().Add(writeWait))
+	return c.WebSocket.WriteJSON(msg)
+}
+
+func (c *Client) WriteMessage(msgType int) error {
+	c.WebSocket.SetWriteDeadline(time.Now().Add(writeWait))
+	return c.WebSocket.WriteMessage(msgType, []byte{})
 }

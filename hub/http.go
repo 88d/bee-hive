@@ -24,7 +24,7 @@ func (h *Hub) ServeHub() http.HandlerFunc {
 			return
 		}
 		ids += 1
-		conn := NewConn(ws, string(ids), "blablabla")
+		conn := NewClient(ws, string(ids), "blablabla")
 		h.register <- conn
 		go conn.writePump()
 		conn.readPump()
