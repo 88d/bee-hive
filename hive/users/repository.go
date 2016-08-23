@@ -16,15 +16,12 @@ func NewRepository() *Repository {
 
 func (re *Repository) GetAll() ([]*User, error) {
 	res, err := re.Table().Run(re.Session)
+	defer res.Close()
 	if err != nil {
 		return nil, err
 	}
-	defer res.Close()
 	var users = make([]*User, 0)
-	if err := res.All(&users); err != nil {
-		return nil, err
-	}
-	return users, err
+	return users, res.All(&users)
 }
 
 func (re *Repository) Create(q *User) error {
@@ -37,28 +34,21 @@ func (re *Repository) Create(q *User) error {
 }
 
 func (re *Repository) Update(q *User) error {
-	if _, err := re.Table().Get(q.ID).Update(q).RunWrite(re.Session); err != nil {
-		return err
-	}
-	return nil
+	_, err := re.Table().Get(q.ID).Update(q).RunWrite(re.Session)
+	return err
 }
 
 func (re *Repository) GetByID(id string) (*User, error) {
 	res, err := re.Table().Get(id).Run(re.Session)
+	defer res.Close()
 	if err != nil {
 		return nil, err
 	}
-	defer res.Close()
 	var q *User
-	if err := res.One(&q); err != nil {
-		return nil, err
-	}
-	return q, nil
+	return q, res.One(&q)
 }
 
 func (re *Repository) RemoveByID(id string) error {
-	if _, err := re.Table().Get(id).Delete().RunWrite(re.Session); err != nil {
-		return err
-	}
-	return nil
+	_, err := re.Table().Get(id).Delete().RunWrite(re.Session)
+	return err
 }

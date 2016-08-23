@@ -1,9 +1,14 @@
 package questions
 
 import "github.com/black-banana/bee-hive/rethink"
+import "github.com/black-banana/bee-hive/hive/answers"
+import "github.com/black-banana/bee-hive/hive/users"
 import r "github.com/dancannon/gorethink"
 
-var TableName = "questions"
+var (
+	TableName     = "questions"
+	AuthorIDField = "author_id"
+)
 
 type Repository struct {
 	rethink.Repository
@@ -43,7 +48,6 @@ func (re *Repository) Update(q *Question) error {
 func (re *Repository) GetByID(id string) (*Question, error) {
 	res, err := re.Table().
 		Get(id).
-		Default(defaults).
 		Merge(mergeAuthor).
 		Merge(mergeAnswers(id)).
 		Run(re.Session)
@@ -62,21 +66,17 @@ func (re *Repository) RemoveByID(id string) error {
 	return nil
 }
 
-var defaults = map[string]interface{}{
-	"author_id": "",
-}
-
 func mergeAuthor(p r.Term) interface{} {
 	return map[string]interface{}{
-		"author_id": r.Table("users").Get(p.Field("author_id")),
+		AuthorIDField: r.Table(users.TableName).Get(p.Field(AuthorIDField)),
 	}
 }
 
 func mergeAnswers(id string) func(r.Term) interface{} {
 	return func(p r.Term) interface{} {
 		return map[string]interface{}{
-			"answers": r.Table("answers").
-				GetAllByIndex("question_id", id).
+			answers.TableName: r.Table(answers.TableName).
+				GetAllByIndex(answers.QuestionIDField, id).
 				Merge(mergeAuthor).
 				CoerceTo("array"),
 		}
