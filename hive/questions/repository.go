@@ -10,12 +10,12 @@ var (
 	AuthorIDField = "author_id"
 )
 
+// Repository for access to questions
 type Repository struct {
 	rethink.Repository
 }
 
-var repository *Repository
-
+// NewRepository creates new repository for access to questions
 func NewRepository() *Repository {
 	return &Repository{rethink.NewRepository(TableName)}
 }

@@ -18,11 +18,13 @@ func (re *Repository) Table() r.Term {
 	return r.Table(re.table)
 }
 
+// CreateTableIndexIfNotExists is a shortcut for the same method
+func (re *Repository) CreateTableIndexIfNotExists(fieldName string) error {
+	return CreateTableIndexIfNotExists(re.Session, re.table, fieldName)
+}
+
 func (re *Repository) init() error {
-	if err := CreateTableIfNotExists(re.Session, re.table); err != nil {
-		return err
-	}
-	return nil
+	return CreateTableIfNotExists(re.Session, re.table)
 }
 
 // NewRepository creates a Repository with given table to access rethinkdb

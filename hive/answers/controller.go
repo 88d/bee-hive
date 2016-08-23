@@ -9,8 +9,10 @@ import (
 var (
 	paramQuestion = "questionId"
 	paramID       = "id"
+	repository    *Repository
 )
 
+// New creates a new instance of the answers controller
 func New(e *echo.Group) {
 	repository = NewRepository()
 	group := e.Group("/:questionId/answers")

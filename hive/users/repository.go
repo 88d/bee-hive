@@ -4,12 +4,12 @@ import "github.com/black-banana/bee-hive/rethink"
 
 var TableName = "users"
 
+// Repository for access to users
 type Repository struct {
 	rethink.Repository
 }
 
-var repository *Repository
-
+// NewRepository creates new repository for access to users
 func NewRepository() *Repository {
 	return &Repository{rethink.NewRepository(TableName)}
 }

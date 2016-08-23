@@ -3,6 +3,7 @@ package questions
 import "github.com/black-banana/bee-hive/hive/users"
 import "github.com/black-banana/bee-hive/hive/answers"
 
+// Question is used to store information about a question
 type Question struct {
 	ID          string           `gorethink:"id,omitempty" json:"id,omitempty"`
 	Title       string           `gorethink:"title" json:"title,omitempty"`

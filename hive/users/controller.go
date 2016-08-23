@@ -6,7 +6,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-var paramID = "id"
+var (
+	paramID    = "id"
+	repository *Repository
+)
 
 // New creates a new instance of the users Controller
 func New(e *echo.Group) {

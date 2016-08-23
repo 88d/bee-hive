@@ -7,8 +7,12 @@ import (
 	"github.com/labstack/echo"
 )
 
-var paramID = "id"
+var (
+	paramID    = "id"
+	repository *Repository
+)
 
+// New creates an new instance of the questions controller
 func New(e *echo.Group) {
 	repository = NewRepository()
 	group := e.Group("/questions")

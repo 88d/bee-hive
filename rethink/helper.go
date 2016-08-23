@@ -53,6 +53,7 @@ func CreateTableIfNotExists(session *r.Session, table string) error {
 	return nil
 }
 
+// CreateTableIndexIfNotExists creates an index to the specified table if not exist
 func CreateTableIndexIfNotExists(session *r.Session, table string, index string) error {
 	log.Println("CreateTableIndexIfNotExists", table)
 	indexListRes, err := r.Table(table).IndexList().Run(session)

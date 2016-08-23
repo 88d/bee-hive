@@ -12,12 +12,12 @@ var (
 	AuthorIDField   = "author_id"
 )
 
+// Repository for access to answers
 type Repository struct {
 	rethink.Repository
 }
 
-var repository *Repository
-
+// NewRepository creates new repository for access to answers
 func NewRepository() *Repository {
 	var repo = &Repository{rethink.NewRepository(TableName)}
 	rethink.CreateTableIndexIfNotExists(repo.Session, TableName, QuestionIDField)
