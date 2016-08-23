@@ -4,8 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/black-banana/bee-hive/hive/question"
+	"github.com/black-banana/bee-hive/hive/user"
 	"github.com/black-banana/bee-hive/hub"
-	"github.com/black-banana/bee-hive/questions"
 	"github.com/black-banana/bee-hive/rethink"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -21,7 +22,7 @@ func main() {
 
 	// Echo instance
 	e := echo.New()
-
+	e.SetDebug(true)
 	e.SetHTTPErrorHandler(func(err error, c echo.Context) {
 		code := http.StatusInternalServerError
 		if err == rethink.ErrEmptyResult {
@@ -55,7 +56,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	api := e.Group("/api")
-	questions.New(api)
+	question.New(api)
+	user.New(api)
 
 	go hub.Run()
 
