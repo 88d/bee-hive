@@ -12,25 +12,45 @@ type Config struct {
 	db     *rethink.Config
 }
 
+var defaultConfig = `{
+		"listen":":9999",
+		"db": {
+			"server":"localhost:28015",
+			"name":"beehive",
+			"maxidle":10,
+			"maxopen":10
+		}
+	}`
+
 var globalConfig = new(Config)
 
-func LoadConfiguration() {
-	// Configuration
-	cfg, err := config.ParseJsonFile("config.json")
-	cfg.Env().Flag()
+func loadConfiguration() {
+	// Load Default Config
+	cfg, err := config.ParseJson(defaultConfig)
 	if err != nil {
 		panic(err)
 	}
+	// Configuration
+	cfgFile, err := config.ParseJsonFile("config.json")
+	cfgFile.Env().Flag()
+	if err != nil {
+		log.Printf("no config file 'config.json' found will use default values")
+	} else {
+		cfg, err = cfg.Extend(cfgFile)
+		if err != nil {
+			panic(err)
+		}
+	}
 
-	globalConfig.listen = panicIfMissing(cfg, "listen")
+	globalConfig.listen = getString(cfg, "listen")
 	globalConfig.db = new(rethink.Config)
-	globalConfig.db.Server = panicIfMissing(cfg, "db.server")
-	globalConfig.db.Name = panicIfMissing(cfg, "db.name")
-	globalConfig.db.MaxIdle = defaultIfMissingInt(cfg, "db.maxidle", 10)
-	globalConfig.db.MaxOpen = defaultIfMissingInt(cfg, "db.maxopen", 10)
+	globalConfig.db.Server = getString(cfg, "db.server")
+	globalConfig.db.Name = getString(cfg, "db.name")
+	globalConfig.db.MaxIdle = getInt(cfg, "db.maxidle")
+	globalConfig.db.MaxOpen = getInt(cfg, "db.maxopen")
 }
 
-func panicIfMissing(cfg *config.Config, cfgValue string) string {
+func getString(cfg *config.Config, cfgValue string) string {
 	var value, err = cfg.String(cfgValue)
 	log.Printf(cfgValue, value)
 	if err != nil {
@@ -39,11 +59,11 @@ func panicIfMissing(cfg *config.Config, cfgValue string) string {
 	return value
 }
 
-func defaultIfMissingInt(cfg *config.Config, cfgValue string, defaultValue int) int {
+func getInt(cfg *config.Config, cfgValue string) int {
 	var value, err = cfg.Int(cfgValue)
 	log.Printf(cfgValue, value)
 	if err != nil {
-		return defaultValue
+		panic(err)
 	}
 	return value
 }

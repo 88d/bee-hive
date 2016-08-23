@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// LoadConfiguration from config.json
-	LoadConfiguration()
+	loadConfiguration()
 
 	rethink.StartMasterSession(globalConfig.db)
 	defer rethink.StopMasterSession()
