@@ -1,27 +1,25 @@
 package hub
 
-import "log"
-
 type Hub struct {
 	// Registered connections.
-	connections map[*Conn]bool
+	connections map[*Client]bool
 
 	// Inbound messages from the connections.
 	broadcast chan *Message
 
 	// Register requests from the connections.
-	register chan *Conn
+	register chan *Client
 
 	// Unregister requests from connections.
-	unregister chan *Conn
+	unregister chan *Client
 }
 
 func NewHub() *Hub {
 	return &Hub{
 		broadcast:   make(chan *Message),
-		register:    make(chan *Conn),
-		unregister:  make(chan *Conn),
-		connections: make(map[*Conn]bool),
+		register:    make(chan *Client),
+		unregister:  make(chan *Client),
+		connections: make(map[*Client]bool),
 	}
 }
 
@@ -35,16 +33,13 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case conn := <-h.register:
-			log.Println("register")
 			h.connections[conn] = true
 		case conn := <-h.unregister:
-			log.Println("unregister")
 			if _, ok := h.connections[conn]; ok {
 				delete(h.connections, conn)
 				close(conn.Send)
 			}
 		case message := <-h.broadcast:
-			log.Println("broadcast")
 			for conn := range h.connections {
 				select {
 				case conn.Send <- message:
@@ -57,11 +52,11 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) Register(conn *Conn) {
+func (h *Hub) Register(conn *Client) {
 	h.register <- conn
 }
 
-func (h *Hub) UnRegister(conn *Conn) {
+func (h *Hub) UnRegister(conn *Client) {
 	h.unregister <- conn
 }
 

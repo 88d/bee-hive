@@ -15,7 +15,7 @@ func NewPingMessage() Message {
 }
 
 func NewMessage() Message {
-	return Message{"", "", "message"}
+	return Message{"", "", "msg"}
 }
 
 func NewErrorMessage(err error) Message {

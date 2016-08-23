@@ -21,15 +21,15 @@ const (
 )
 
 // Conn is an middleman between the websocket connection and the hub.
-type Conn struct {
+type Client struct {
 	WebSocket    *websocket.Conn
 	Send         chan *Message
 	SessionToken string
 	UserID       string
 }
 
-func NewConn(ws *websocket.Conn, userId string, sessionToken string) *Conn {
-	return &Conn{
+func NewConn(ws *websocket.Conn, userId string, sessionToken string) *Client {
+	return &Client{
 		Send:         make(chan *Message, 64),
 		WebSocket:    ws,
 		UserID:       userId,
@@ -38,7 +38,7 @@ func NewConn(ws *websocket.Conn, userId string, sessionToken string) *Conn {
 }
 
 // readPump pumps messages from the websocket connection to the hub.
-func (c *Conn) readPump() {
+func (c *Client) readPump() {
 	defer func() {
 		h.UnRegister(c)
 		c.WebSocket.Close()
@@ -57,7 +57,7 @@ func (c *Conn) readPump() {
 }
 
 // writePump pumps messages from the hub to the websocket connection.
-func (c *Conn) writePump() {
+func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 
 	defer func() {
@@ -69,19 +69,16 @@ func (c *Conn) writePump() {
 		select {
 		case message, ok := <-c.Send:
 			if !ok {
-				c.WebSocket.SetWriteDeadline(time.Now().Add(writeWait))
 				c.WebSocket.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-
 			c.WebSocket.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.WebSocket.WriteJSON(message); err != nil {
 				return
 			}
 
 		case <-ticker.C:
-			c.WebSocket.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.WebSocket.WriteJSON(NewPingMessage()); err != nil {
+			if err := c.WebSocket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				return
 			}
 		}
