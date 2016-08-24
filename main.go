@@ -27,6 +27,11 @@ func main() {
 
 	// Middleware
 	e.Use(middleware.Logger())
+
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: globalConfig.auth.SigningKey,
+		Claims:     globalConfig.auth.Claims,
+	}))
 	e.Use(middleware.Recover())
 
 	api := e.Group("/api")
