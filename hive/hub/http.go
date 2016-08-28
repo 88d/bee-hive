@@ -25,10 +25,10 @@ func (h *Hub) ServeHub() http.HandlerFunc {
 			return
 		}
 		ids++
-		conn := NewClient(ws, strconv.Itoa(ids), "blablabla")
-		h.register <- conn
-		go conn.writePump()
-		conn.readPump()
+		client := NewClient(ws, strconv.Itoa(ids), "blablabla")
+		h.register <- client
+		go client.writePump()
+		client.readPump()
 	}
 }
 

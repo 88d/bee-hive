@@ -45,26 +45,30 @@ func (c *Client) readPump() {
 	}()
 	c.WebSocket.SetReadLimit(maxMessageSize)
 	c.WebSocket.SetReadDeadline(time.Now().Add(pongWait))
-	c.WebSocket.SetPongHandler(func(string) error { c.WebSocket.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.WebSocket.SetPongHandler(func(string) error {
+		c.WebSocket.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 	for {
 		var message Message
 		if err := c.WebSocket.ReadJSON(&message); err != nil {
 			return
 		}
 		message.Author = c.UserID
-		root.Broadcast(&message)
+		if root.MessageReceived != nil {
+			root.MessageReceived(&message, c, root)
+		}
+		//root.Broadcast(&message)
 	}
 }
 
 // writePump pumps messages from the hub to the websocket connection.
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
-
 	defer func() {
 		ticker.Stop()
 		c.WebSocket.Close()
 	}()
-
 	for {
 		select {
 		case message, ok := <-c.Send:
