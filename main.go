@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/black-banana/bee-hive/hive/auth"
+	"github.com/black-banana/bee-hive/hive/hub"
 	"github.com/black-banana/bee-hive/hive/questions"
 	"github.com/black-banana/bee-hive/hive/users"
-	"github.com/black-banana/bee-hive/hub"
 	"github.com/black-banana/bee-hive/rethink"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -28,19 +29,22 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 
-	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: globalConfig.auth.SigningKey,
-		Claims:     globalConfig.auth.Claims,
-	}))
+	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+	// 	SigningKey: globalConfig.auth.SigningKey,
+	// 	Claims:     globalConfig.auth.Claims,
+	// }))
 	e.Use(middleware.Recover())
 
 	api := e.Group("/api")
 	questions.New(api)
 	users.New(api)
+	auth.New(api, globalConfig.auth)
 
-	go hub.Run()
+	h := hub.NewHub()
+	go h.Run()
+	go questions.GetAllChanges(h)
 
-	e.GET("/hub", standard.WrapHandler(http.HandlerFunc(hub.ServeHub())))
+	e.GET("/hub", standard.WrapHandler(http.HandlerFunc(h.ServeHub())))
 
 	routes := e.Routes()
 	for _, route := range routes {

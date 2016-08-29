@@ -26,21 +26,23 @@ type Client struct {
 	Send         chan *Message
 	SessionToken string
 	UserID       string
+	Hub          *Hub
 }
 
-func NewClient(ws *websocket.Conn, userId string, sessionToken string) *Client {
+func NewClient(ws *websocket.Conn, userId string, sessionToken string, hub *Hub) *Client {
 	return &Client{
 		Send:         make(chan *Message, 64),
 		WebSocket:    ws,
 		UserID:       userId,
 		SessionToken: sessionToken,
+		Hub:          hub,
 	}
 }
 
 // readPump pumps messages from the websocket connection to the hub.
 func (c *Client) readPump() {
 	defer func() {
-		root.UnRegister(c)
+		c.Hub.UnRegister(c)
 		c.WebSocket.Close()
 	}()
 	c.WebSocket.SetReadLimit(maxMessageSize)
@@ -55,8 +57,8 @@ func (c *Client) readPump() {
 			return
 		}
 		message.Author = c.UserID
-		if root.MessageReceived != nil {
-			root.MessageReceived(&message, c, root)
+		if c.Hub.MessageReceived != nil {
+			c.Hub.MessageReceived(&message, c, c.Hub)
 		}
 		//root.Broadcast(&message)
 	}

@@ -25,16 +25,6 @@ func NewHub() *Hub {
 	}
 }
 
-var root = NewHub()
-
-func Root() *Hub {
-	return root
-}
-
-func Run() {
-	root.Run()
-}
-
 func (h *Hub) Run() {
 	for {
 		select {

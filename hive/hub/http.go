@@ -25,13 +25,9 @@ func (h *Hub) ServeHub() http.HandlerFunc {
 			return
 		}
 		ids++
-		client := NewClient(ws, strconv.Itoa(ids), "blablabla")
+		client := NewClient(ws, strconv.Itoa(ids), "blablabla", h)
 		h.register <- client
 		go client.writePump()
 		client.readPump()
 	}
-}
-
-func ServeHub() http.HandlerFunc {
-	return root.ServeHub()
 }
