@@ -6,6 +6,11 @@ import (
 	"github.com/labstack/echo"
 )
 
+type LoginModel struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 var (
 	config *Config
 )
@@ -18,10 +23,12 @@ func New(e *echo.Group, c *Config) {
 }
 
 func login(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
+	login := new(LoginModel)
+	if err := c.Bind(&login); err != nil {
+		return err
+	}
 
-	if username == "opi" && password == "opi" {
+	if login.Username == "opi" && login.Password == "opi" {
 		t := GenerateToken("hahaha", []string{"admin"})
 		return c.JSON(http.StatusOK, map[string]string{
 			"token": t,
