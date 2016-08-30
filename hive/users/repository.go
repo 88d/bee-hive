@@ -1,6 +1,9 @@
 package users
 
-import "github.com/black-banana/bee-hive/rethink"
+import (
+	"github.com/black-banana/bee-hive/rethink"
+	r "github.com/dancannon/gorethink"
+)
 
 var TableName = "users"
 
@@ -40,6 +43,17 @@ func (re *Repository) Update(q *User) error {
 
 func (re *Repository) GetByID(id string) (*User, error) {
 	res, err := re.Table().Get(id).Run(re.Session)
+	defer res.Close()
+	if err != nil {
+		return nil, err
+	}
+	var q *User
+	return q, res.One(&q)
+}
+
+func (re *Repository) GetByName(name string) (*User, error) {
+	res, err := re.Table().
+		Filter(r.Row.Field("name").Eq(name)).Run(re.Session)
 	defer res.Close()
 	if err != nil {
 		return nil, err

@@ -7,15 +7,15 @@ import (
 )
 
 // GenerateToken string to use as needed
-func GenerateToken(userID string, access []string) string {
+func GenerateToken(userID string, scopes []string) string {
 	claims := &JwtCustomClaims{
 		userID,
-		access,
+		scopes,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * time.Duration(config.ExpireHours)).Unix(),
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, err := token.SignedString([]byte(config.SigningKey))
 	if err != nil {
 		return ""
