@@ -2,6 +2,7 @@ package answers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -41,6 +42,7 @@ func getByID(c echo.Context) error {
 
 func create(c echo.Context) error {
 	a := new(Answer)
+	a.CreatedAt = time.Now().UTC()
 	if err := c.Bind(a); err != nil {
 		return err
 	}
@@ -52,6 +54,7 @@ func create(c echo.Context) error {
 
 func update(c echo.Context) error {
 	a := new(Answer)
+	a.UpdatedAt = time.Now().UTC()
 	if err := c.Bind(a); err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package questions
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/black-banana/bee-hive/hive/answers"
 	"github.com/labstack/echo"
@@ -42,6 +43,7 @@ func getByID(c echo.Context) error {
 
 func create(c echo.Context) error {
 	q := new(Question)
+	q.CreatedAt = time.Now().UTC()
 	if err := c.Bind(q); err != nil {
 		return err
 	}
@@ -57,6 +59,7 @@ func update(c echo.Context) error {
 		return err
 	}
 	q.ID = c.Param(paramID)
+	q.UpdatedAt = time.Now().UTC()
 	if err := repository.Update(q); err != nil {
 		return err
 	}
