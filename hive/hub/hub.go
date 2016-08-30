@@ -13,7 +13,7 @@ type Hub struct {
 	// Unregister requests from connections.
 	unregister chan *Client
 
-	MessageReceived func(receivedMessage *Message, receivedClient *Client, receivedHub *Hub)
+	MessageReceived func(receivedMessage *Message, receivedClient *Client)
 }
 
 func NewHub() *Hub {

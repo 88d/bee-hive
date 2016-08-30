@@ -58,7 +58,7 @@ func (c *Client) readPump() {
 		}
 		message.Author = c.UserID
 		if c.Hub.MessageReceived != nil {
-			c.Hub.MessageReceived(&message, c, c.Hub)
+			c.Hub.MessageReceived(&message, c)
 		}
 		//root.Broadcast(&message)
 	}
