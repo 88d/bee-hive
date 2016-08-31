@@ -29,13 +29,16 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 
-	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-	// 	SigningKey: globalConfig.auth.SigningKey,
-	// 	Claims:     globalConfig.auth.Claims,
-	// }))
 	e.Use(middleware.Recover())
 
 	api := e.Group("/api")
+
+	api.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		Skipper:    JWTSkipper,
+		SigningKey: []byte(globalConfig.auth.SigningKey),
+		Claims:     &auth.JwtCustomClaims{},
+	}))
+
 	questions.New(api)
 	users.New(api)
 	auth.New(api, globalConfig.auth)
@@ -53,4 +56,11 @@ func main() {
 
 	log.Println("Started with", globalConfig.listen)
 	e.Run(standard.New(globalConfig.listen))
+}
+
+func JWTSkipper(c echo.Context) bool {
+	if c.Request().URI() == "/api/auth/login" {
+		return true
+	}
+	return false
 }

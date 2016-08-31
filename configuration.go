@@ -14,7 +14,8 @@ type Config struct {
 	auth   *auth.Config
 }
 
-var defaultConfig = `{
+var defaultConfig = `
+	{
 		"listen":":9999",
 		"db": {
 			"server":"localhost:28015",
@@ -25,7 +26,8 @@ var defaultConfig = `{
 		"auth": {
 			"expirehours":72
 		}
-	}`
+	}
+`
 
 var globalConfig = new(Config)
 
