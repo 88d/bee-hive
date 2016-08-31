@@ -23,7 +23,7 @@ func main() {
 
 	// Echo instance
 	e := echo.New()
-	e.SetDebug(true)
+	e.SetDebug(globalConfig.debug)
 	e.SetHTTPErrorHandler(JSONErrorHandler)
 
 	// Middleware

@@ -1,9 +1,14 @@
 {
     "listen":":9999",
+    "debug":true,
     "db": {
         "server":"localhost:28015",
         "name":"beehive",
         "maxidle":10,
         "maxopen":10
-    }
+    },
+    "auth": {
+		"expirehours":72,
+        "signingkey":"testKEY"
+	}
 }

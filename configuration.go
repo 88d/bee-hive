@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	listen string
+	debug  bool
 	db     *rethink.Config
 	auth   *auth.Config
 }
@@ -17,6 +18,7 @@ type Config struct {
 var defaultConfig = `
 	{
 		"listen":":9999",
+		"debug":true,
 		"db": {
 			"server":"localhost:28015",
 			"name":"beehive",
@@ -50,6 +52,7 @@ func loadConfiguration() {
 	}
 
 	globalConfig.listen = getString(cfg, "listen")
+	globalConfig.debug = getBool(cfg, "debug")
 	globalConfig.db = new(rethink.Config)
 	globalConfig.db.Server = getString(cfg, "db.server")
 	globalConfig.db.Name = getString(cfg, "db.name")
@@ -71,6 +74,15 @@ func getString(cfg *config.Config, cfgValue string) string {
 
 func getInt(cfg *config.Config, cfgValue string) int {
 	var value, err = cfg.Int(cfgValue)
+	if err != nil {
+		panic(err)
+	}
+	log.Printf(cfgValue, value)
+	return value
+}
+
+func getBool(cfg *config.Config, cfgValue string) bool {
+	var value, err = cfg.Bool(cfgValue)
 	if err != nil {
 		panic(err)
 	}
