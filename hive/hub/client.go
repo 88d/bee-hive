@@ -22,20 +22,18 @@ const (
 
 // Client is an middleman between the websocket connection and the hub.
 type Client struct {
-	WebSocket    *websocket.Conn
-	Send         chan *Message
-	SessionToken string
-	UserID       string
-	Hub          *Hub
+	WebSocket *websocket.Conn
+	Send      chan *Message
+	UserID    string
+	Hub       *Hub
 }
 
-func NewClient(ws *websocket.Conn, userId string, sessionToken string, hub *Hub) *Client {
+func NewClient(ws *websocket.Conn, userId string, hub *Hub) *Client {
 	return &Client{
-		Send:         make(chan *Message, 64),
-		WebSocket:    ws,
-		UserID:       userId,
-		SessionToken: sessionToken,
-		Hub:          hub,
+		Send:      make(chan *Message, 64),
+		WebSocket: ws,
+		UserID:    userId,
+		Hub:       hub,
 	}
 }
 
