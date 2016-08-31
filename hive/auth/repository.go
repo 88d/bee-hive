@@ -1,6 +1,9 @@
 package auth
 
-import "github.com/black-banana/bee-hive/rethink"
+import (
+	"github.com/black-banana/bee-hive/rethink"
+	"github.com/juju/errors"
+)
 
 var (
 	TableName = "user_scopes"
@@ -27,36 +30,36 @@ func (re *Repository) GetUserScopes(userID string) (*UserScopes, error) {
 		return nil, err
 	}
 	var userScopes UserScopes
-	return &userScopes, res.One(&userScopes)
+	return &userScopes, errors.Annotate(res.One(&userScopes), "GetUserScopes")
 }
 
 func (re *Repository) CreateUserScopes(userID string) (*UserScopes, error) {
 	var userScopes = &UserScopes{userID, []string{}}
 	_, err := re.Table().Insert(userScopes).RunWrite(re.Session)
-	return userScopes, err
+	return userScopes, errors.Annotate(err, "CreateUserScopes")
 }
 
 func (re *Repository) UpdateUserScopes(a *UserScopes) error {
 	_, err := re.Table().Get(a.UserID).Update(a).RunWrite(re.Session)
-	return err
+	return errors.Annotate(err, "UpdateUserScopes")
 }
 
 func (re *Repository) RevokeScope(userID string, scope string) error {
 	userScopes, err := re.GetUserScopes(userID)
 	if err != nil {
-		return err
+		return errors.Annotate(err, "RevokeScope")
 	}
 	userScopes.Scopes = deleteStringInArray(userScopes.Scopes, scope)
-	return re.UpdateUserScopes(userScopes)
+	return errors.Annotate(re.UpdateUserScopes(userScopes), "RevokeScope")
 }
 
 func (re *Repository) GrantScope(userID string, scope string) error {
 	userScopes, err := re.GetUserScopes(userID)
 	if err != nil {
-		return err
+		return errors.Annotate(err, "GrantScope")
 	}
 	userScopes.Scopes = append(userScopes.Scopes, scope)
-	return re.UpdateUserScopes(userScopes)
+	return errors.Annotate(re.UpdateUserScopes(userScopes), "GrantScope")
 }
 
 func isStringInArray(list []string, a string) bool {

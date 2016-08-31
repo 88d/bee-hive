@@ -4,6 +4,7 @@ import (
 	"github.com/black-banana/bee-hive/hive/users"
 	"github.com/black-banana/bee-hive/rethink"
 	r "github.com/dancannon/gorethink"
+	"github.com/juju/errors"
 )
 
 var (
@@ -31,17 +32,17 @@ func (re *Repository) GetAll(questionID string) ([]*Answer, error) {
 		Run(re.Session)
 	defer res.Close()
 	if err != nil {
-		return nil, err
+		return nil, errors.Annotate(err, "GetAll")
 	}
 	var answers = make([]*Answer, 0)
-	return answers, res.All(&answers)
+	return answers, errors.Annotate(res.All(&answers), "GetAll")
 }
 
 func (re *Repository) Create(questionID string, a *Answer) error {
 	a.QuestionID = questionID
 	res, err := re.Table().Insert(a).RunWrite(re.Session)
 	if err != nil {
-		return err
+		return errors.Annotate(err, "Create")
 	}
 	a.ID = res.GeneratedKeys[0]
 	return nil
@@ -50,7 +51,7 @@ func (re *Repository) Create(questionID string, a *Answer) error {
 func (re *Repository) Update(questionID string, a *Answer) error {
 	a.QuestionID = questionID
 	_, err := re.Table().Filter(filterQuestionID(questionID)).Get(a.ID).Update(a).RunWrite(re.Session)
-	return err
+	return errors.Annotate(err, "Update")
 }
 
 func (re *Repository) GetByID(questionID string, id string) (*Answer, error) {
@@ -60,12 +61,12 @@ func (re *Repository) GetByID(questionID string, id string) (*Answer, error) {
 		return nil, err
 	}
 	var a *Answer
-	return a, res.One(&a)
+	return a, errors.Annotate(res.One(&a), "GetByID")
 }
 
 func (re *Repository) RemoveByID(questionID string, id string) error {
 	_, err := re.Table().Filter(filterQuestionID(questionID)).Get(id).Delete().RunWrite(re.Session)
-	return err
+	return errors.Annotate(err, "RemoveByID")
 }
 
 func filterQuestionID(id string) map[string]interface{} {

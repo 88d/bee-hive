@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/black-banana/bee-hive/rethink"
 	r "github.com/dancannon/gorethink"
+	"github.com/juju/errors"
 )
 
 var TableName = "users"
@@ -21,16 +22,16 @@ func (re *Repository) GetAll() ([]*User, error) {
 	res, err := re.Table().Run(re.Session)
 	defer res.Close()
 	if err != nil {
-		return nil, err
+		return nil, errors.Annotate(err, "GetAll")
 	}
 	var users = make([]*User, 0)
-	return users, res.All(&users)
+	return users, errors.Annotate(res.All(&users), "GetAll")
 }
 
 func (re *Repository) Create(q *User) error {
 	res, err := re.Table().Insert(q).RunWrite(re.Session)
 	if err != nil {
-		return err
+		return errors.Annotate(err, "Create")
 	}
 	q.ID = res.GeneratedKeys[0]
 	return nil
@@ -38,17 +39,17 @@ func (re *Repository) Create(q *User) error {
 
 func (re *Repository) Update(q *User) error {
 	_, err := re.Table().Get(q.ID).Update(q).RunWrite(re.Session)
-	return err
+	return errors.Annotate(err, "Update")
 }
 
 func (re *Repository) GetByID(id string) (*User, error) {
 	res, err := re.Table().Get(id).Run(re.Session)
 	defer res.Close()
 	if err != nil {
-		return nil, err
+		return nil, errors.Annotate(err, "GetByID")
 	}
 	var q *User
-	return q, res.One(&q)
+	return q, errors.Annotate(res.One(&q), "GetByID")
 }
 
 func (re *Repository) GetByName(name string) (*User, error) {
@@ -56,13 +57,13 @@ func (re *Repository) GetByName(name string) (*User, error) {
 		Filter(r.Row.Field("name").Eq(name)).Run(re.Session)
 	defer res.Close()
 	if err != nil {
-		return nil, err
+		return nil, errors.Annotate(err, "GetByName")
 	}
 	var q *User
-	return q, res.One(&q)
+	return q, errors.Annotate(res.One(&q), "GetByName")
 }
 
 func (re *Repository) RemoveByID(id string) error {
 	_, err := re.Table().Get(id).Delete().RunWrite(re.Session)
-	return err
+	return errors.Annotate(err, "RemoveByID")
 }

@@ -3,6 +3,7 @@ package questions
 import "github.com/black-banana/bee-hive/rethink"
 import "github.com/black-banana/bee-hive/hive/answers"
 import "github.com/black-banana/bee-hive/hive/users"
+import "github.com/juju/errors"
 import r "github.com/dancannon/gorethink"
 
 var (
@@ -25,16 +26,16 @@ func (re *Repository) GetAll() ([]*Question, error) {
 		Merge(mergeAuthor).Run(re.Session)
 	defer res.Close()
 	if err != nil {
-		return nil, err
+		return nil, errors.Annotate(err, "GetAll")
 	}
 	var questions = make([]*Question, 0)
-	return questions, res.All(&questions)
+	return questions, errors.Annotate(res.All(&questions), "GetAll")
 }
 
 func (re *Repository) Create(q *Question) error {
 	res, err := re.Table().Insert(q).RunWrite(re.Session)
 	if err != nil {
-		return err
+		return errors.Annotate(err, "Create")
 	}
 	q.ID = res.GeneratedKeys[0]
 	return nil
@@ -42,7 +43,7 @@ func (re *Repository) Create(q *Question) error {
 
 func (re *Repository) Update(q *Question) error {
 	_, err := re.Table().Get(q.ID).Update(q).RunWrite(re.Session)
-	return err
+	return errors.Annotate(err, "Update")
 }
 
 func (re *Repository) GetByID(id string) (*Question, error) {
@@ -53,10 +54,10 @@ func (re *Repository) GetByID(id string) (*Question, error) {
 		Run(re.Session)
 	defer res.Close()
 	if err != nil {
-		return nil, err
+		return nil, errors.Annotate(err, "GetByID")
 	}
 	var q *Question
-	return q, res.One(&q)
+	return q, errors.Annotate(res.One(&q), "GetByID")
 }
 
 func (re *Repository) RemoveByID(id string) error {
